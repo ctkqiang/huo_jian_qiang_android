@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.huo_jian_qiang_android.R
 import xin.ctkqiang.huo_jian_qiang_android.model.HTTPRequest
@@ -74,7 +74,6 @@ class HttpAttackPage {
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
         }
 
         @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +109,7 @@ class HttpAttackPage {
                                 text = {
                                     Text(
                                         text = method.name,
+                                        fontWeight = FontWeight.Bold,
                                         color = when (method) {
                                             HTTPRequest.GET -> Color(0xFF4CAF50)
                                             HTTPRequest.POST -> Color(0xFFFFC107)
