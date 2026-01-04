@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import xin.ctkqiang.huo_jian_qiang_android.R
 import xin.ctkqiang.huo_jian_qiang_android.model.HTTPRequest
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Black
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.DarkRed
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Gray
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Red
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.White
@@ -133,7 +134,7 @@ class HttpAttackPage {
         fun getTextFieldColor() : TextFieldColors {
             return TextFieldDefaults.colors(
                 unfocusedContainerColor = Gray,
-                focusedTextColor = Black,
+                focusedTextColor = DarkRed,
                 unfocusedTextColor = Black,
                 focusedContainerColor = White,
                 focusedIndicatorColor = Red,

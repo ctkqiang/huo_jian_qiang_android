@@ -16,3 +16,5 @@ val Red = Color.Red
 val Black = Color.Black
 val White = Color.White
 val Gray = Color(0xFFEFEEEE)
+
+val DarkRed = Color(0xFF520000)
