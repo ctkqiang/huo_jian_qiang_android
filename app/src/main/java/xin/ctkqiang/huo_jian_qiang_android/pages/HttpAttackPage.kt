@@ -135,7 +135,7 @@ class HttpAttackPage {
             return TextFieldDefaults.colors(
                 unfocusedContainerColor = Gray,
                 focusedTextColor = DarkRed,
-                unfocusedTextColor = Black,
+                unfocusedTextColor = DarkRed,
                 focusedContainerColor = White,
                 focusedIndicatorColor = Red,
                 unfocusedIndicatorColor = Black,
