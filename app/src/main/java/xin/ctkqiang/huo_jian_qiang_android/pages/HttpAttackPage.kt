@@ -1,14 +1,22 @@
 package xin.ctkqiang.huo_jian_qiang_android.pages
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import xin.ctkqiang.huo_jian_qiang_android.model.HTTPRequest
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Black
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Gray
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Red
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.White
 
 class HttpAttackPage {
 
@@ -17,24 +25,115 @@ class HttpAttackPage {
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
         fun HttpAttackForm(sectionName: String) {
+            var currentMethod by remember { mutableStateOf(HTTPRequest.POST) }
+
             val context = LocalContext.current
             val scope = rememberCoroutineScope()
             val snackbarHostState = remember { SnackbarHostState() }
 
             var hostText by remember { mutableStateOf("http://") }
+            var parameter by remember { mutableStateOf("") }
 
             Column (
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text("主机地址 [Host]")
                 TextField(
                     value = hostText,
                     onValueChange = { hostText = it },
                     label = { Text("输入URL") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = getTextFieldColor()
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = parameter,
+                    onValueChange = { parameter = it },
+                    label = { Text("附加用户输入") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = getTextFieldColor()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                HTTPRequestDropdownOption(
+                    selectedMethod = currentMethod,
+                    onMethodChange = { newItem ->
+                        currentMethod = newItem
+                        println("用户选择了: ${newItem.name}")
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
+        }
+
+        @OptIn(ExperimentalMaterial3Api::class)
+        @Composable
+        fun HTTPRequestDropdownOption(selectedMethod: HTTPRequest, onMethodChange: (HTTPRequest) -> Unit) {
+            var expanded by remember { mutableStateOf(false) }
+
+            Column {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = selectedMethod.name,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        colors = getTextFieldColor(),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        // 遍历枚举类中的所有选项
+                        HTTPRequest.entries.forEach { method ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = method.name,
+                                        color = when (method) {
+                                            HTTPRequest.GET -> Color(0xFF4CAF50)
+                                            HTTPRequest.POST -> Color(0xFFFFC107)
+                                            HTTPRequest.DELETE -> Color(0xFFF44336)
+                                            else -> MaterialTheme.colorScheme.onSurface
+                                        }
+                                    )
+                                },
+                                onClick = {
+                                    onMethodChange(method)
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        
+        @Composable
+        fun getTextFieldColor() : TextFieldColors {
+            return TextFieldDefaults.colors(
+                unfocusedContainerColor = White,
+                focusedTextColor = Black,
+                unfocusedTextColor = Black,
+                focusedContainerColor = White,
+                focusedIndicatorColor = Red,
+                unfocusedIndicatorColor = Black,
+            )
         }
     }
 }

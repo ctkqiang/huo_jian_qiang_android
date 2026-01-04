@@ -30,6 +30,7 @@ import xin.ctkqiang.huo_jian_qiang_android.pages.HttpAttackPage
 import xin.ctkqiang.huo_jian_qiang_android.pages.MySQLAttackPage
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Huo_jian_qiang_androidTheme
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Pink
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Red
 
 class HuoJianQiang : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +62,7 @@ fun MainPreview() {
                 Column {
                     TabRow(
                         selectedTabIndex = selectedTabIndex,
-                        contentColor = Pink,
+                        contentColor = Red,
                         divider = {
                             HorizontalDivider()
                         },
@@ -69,7 +70,7 @@ fun MainPreview() {
                             if (selectedTabIndex < tabPositions.size) {
                                 TabRowDefaults.SecondaryIndicator(
                                     Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                                    color = Pink
+                                    color = Red
                                 )
                             }
                         }
@@ -79,7 +80,7 @@ fun MainPreview() {
                                 selected = selectedTabIndex == index,
                                 onClick = { selectedTabIndex = index },
                                 text = { Text(text = title) },
-                                selectedContentColor = Pink,
+                                selectedContentColor = Red,
                                 icon = { }
                             )
                         }
