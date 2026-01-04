@@ -1,5 +1,6 @@
 package xin.ctkqiang.huo_jian_qiang_android.pages
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import xin.ctkqiang.huo_jian_qiang_android.R
 import xin.ctkqiang.huo_jian_qiang_android.model.HTTPRequest
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Black
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Gray
@@ -33,6 +35,10 @@ class HttpAttackPage {
 
             var hostText by remember { mutableStateOf("http://") }
             var parameter by remember { mutableStateOf("") }
+
+            Log.d(R.string.app_name.toString(), "当前文本: $hostText")
+            Log.d(R.string.app_name.toString(), "当前参数: $parameter")
+            Log.d(R.string.app_name.toString(), "当前请求方式: ${currentMethod.name}")
 
             Column (
                 modifier = Modifier.padding(16.dp)
