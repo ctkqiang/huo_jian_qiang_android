@@ -35,6 +35,7 @@ class HttpAttackPage {
             val snackbarHostState = remember { SnackbarHostState() }
 
             var hostText by remember { mutableStateOf("http://") }
+            var isOutput by remember { mutableIntStateOf(0) }
             var parameter by remember { mutableStateOf("username={{user}}&password={{pass}}") }
 
             Log.d(R.string.app_name.toString(), "当前文本: $hostText")
@@ -73,6 +74,10 @@ class HttpAttackPage {
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                if (isOutput != 0) {
+                    OutputView.OutputView(logs = listOf("输出1", "输出2", "输出3")) // TODO Change
+                }
             }
         }
 

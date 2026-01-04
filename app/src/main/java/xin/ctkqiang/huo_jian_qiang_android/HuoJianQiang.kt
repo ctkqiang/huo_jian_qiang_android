@@ -63,7 +63,6 @@ class HuoJianQiang : ComponentActivity() {
 @Composable
 fun MainPreview() {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    var isOutput by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("HTTP攻击", "MYSQL攻击")
 
 
