@@ -15,4 +15,4 @@ val Pink = Color(0xFFFF28A1)
 val Red = Color.Red
 val Black = Color.Black
 val White = Color.White
-val Gray = Color(0xFFDEDEDE)
+val Gray = Color(0xFFEFEEEE)

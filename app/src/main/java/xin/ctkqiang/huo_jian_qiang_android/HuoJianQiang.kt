@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -26,15 +25,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import xin.ctkqiang.huo_jian_qiang_android.pages.HttpAttackPage
 import xin.ctkqiang.huo_jian_qiang_android.pages.MySQLAttackPage
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Huo_jian_qiang_androidTheme
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Pink
 import xin.ctkqiang.huo_jian_qiang_android.ui.theme.Red
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.StatusBar
+import xin.ctkqiang.huo_jian_qiang_android.ui.theme.White
 
 class HuoJianQiang : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContent {
@@ -56,13 +61,18 @@ fun MainPreview() {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("HTTP攻击", "MYSQL攻击")
 
+    StatusBar.SetStatusBarColor(darkIcons = true)
+
     Huo_jian_qiang_androidTheme {
         Scaffold (
+            contentColor = White,
+            containerColor = White,
             topBar = {
                 Column {
                     TabRow(
                         selectedTabIndex = selectedTabIndex,
                         contentColor = Red,
+                        containerColor = White,
                         divider = {
                             HorizontalDivider()
                         },

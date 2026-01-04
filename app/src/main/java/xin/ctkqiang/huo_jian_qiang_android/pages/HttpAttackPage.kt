@@ -104,7 +104,6 @@ class HttpAttackPage {
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {
-                        // 遍历枚举类中的所有选项
                         HTTPRequest.entries.forEach { method ->
                             DropdownMenuItem(
                                 text = {
@@ -133,7 +132,7 @@ class HttpAttackPage {
         @Composable
         fun getTextFieldColor() : TextFieldColors {
             return TextFieldDefaults.colors(
-                unfocusedContainerColor = White,
+                unfocusedContainerColor = Gray,
                 focusedTextColor = Black,
                 unfocusedTextColor = Black,
                 focusedContainerColor = White,
