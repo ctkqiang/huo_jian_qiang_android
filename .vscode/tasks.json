@@ -2,21 +2,49 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "gradle-install-debug",
+            "label": "build-and-install",
+            "dependsOn": ["clean-project", "assemble-debug-apk"],
+            "group": "build"
+        },
+        {
+            "label": "clean-project",
             "type": "shell",
-            "command": "./gradlew",
-            "args": [
-                "installDebug"
-            ],
+            "command": "./gradlew clean",
             "group": "build",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
+            "problemMatcher": []
+        },
+        {
+            "label": "assemble-debug-apk",
+            "type": "shell",
+            "command": "./gradlew :app:assembleDebug",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "install-debug-apk",
+            "type": "shell",
+            "command": "./gradlew :app:installDebug",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "build-all",
+            "type": "shell",
+            "command": "./gradlew build",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "check-dependencies",
+            "type": "shell",
+            "command": "./gradlew :app:dependencies",
+            "group": "build"
+        },
+        {
+            "label": "sync-project",
+            "type": "shell",
+            "command": "./gradlew :app:sync",
+            "group": "build"
         }
     ]
 }

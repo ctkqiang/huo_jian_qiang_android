@@ -1,0 +1,32 @@
+{
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "/opt/homebrew/opt/openjdk",
+            "default": true
+        }
+    ],
+    "java.home": "/opt/homebrew/opt/openjdk",
+    "java.import.gradle.java.home": "/opt/homebrew/opt/openjdk",
+    "kotlin.compiler.jvm.target": "21",
+    "kotlin.debugAdapter.enabled": true,
+    "kotlin.languageServer.enabled": true,
+    "files.exclude": {
+        "**/.gradle": true,
+        "**/.idea": true,
+        "**/build": true,
+        "**/local.properties": true,
+        "**/*.iml": true
+    },
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "kotlin.experimental.tooling.enabled": true,
+    "[kotlin]": {
+        "editor.defaultFormatter": "mathiasfrohlich.Kotlin"
+    },
+    "gradle.nestedProjects": false,
+    "gradle.autoSync": "off",
+    "androidSdk.path": "${env:ANDROID_HOME}"
+}

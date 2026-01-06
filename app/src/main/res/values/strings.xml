@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">火尖枪</string>
+    <string name="url_rock_you">https://github.com/ctkqiang/ZhiMing/releases/download/rockyou.txt/rockyou.txt</string>
 </resources>
