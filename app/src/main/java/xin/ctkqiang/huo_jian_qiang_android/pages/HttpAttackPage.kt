@@ -191,11 +191,10 @@ class HttpAttackPage {
                         },
                         colors = getTextFieldColor(),
                         modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
+                            .menuAnchor().fillMaxWidth()
                     )
 
-                    ExposedDropdownMenu(
+                ExposedDropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {

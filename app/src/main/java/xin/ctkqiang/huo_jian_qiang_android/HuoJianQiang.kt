@@ -20,6 +20,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,6 +38,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.Manifest
+import android.os.Build
 import xin.ctkqiang.huo_jian_qiang_android.controller.Downloader
 import xin.ctkqiang.huo_jian_qiang_android.model.AttackViewModel
 import xin.ctkqiang.huo_jian_qiang_android.pages.HttpAttackPage
@@ -66,6 +75,7 @@ class HuoJianQiang : ComponentActivity() {
 }
 
 
+
 @Preview(showBackground = true)
 @Composable
 fun MainPreview(viewModel: AttackViewModel = viewModel()) {
@@ -75,18 +85,67 @@ fun MainPreview(viewModel: AttackViewModel = viewModel()) {
 
     val url : String = stringResource(R.string.url_rock_you)
 
+    // 控制下载完成对话框的显示
+    var showDownloadDialog by remember { mutableStateOf(false) }
+    // 记录下载是否成功
+    var downloadSuccess by remember { mutableStateOf(false) }
+
+    // 权限请求启动器
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                viewModel.addLog("通知权限已授予")
+            } else {
+                viewModel.addLog("通知权限被拒绝，无法显示下载进度")
+            }
+        }
+    )
+
     LaunchedEffect(Unit) {
-        if (Downloader.isFileExists(context)) {
+        // 请求通知权限 (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        if (Downloader.isFileExists(context, "rockyou.txt")) {
             viewModel.addLog("字典文件已存在，跳过下载。")
         } else {
             viewModel.addLog("检测到字典缺失，开始自动下载...")
-            val success = Downloader.downloadRockYou(context, url)
+            val success = Downloader.downloadFile(context, url, "rockyou.txt", maxRetries = 3)
+            downloadSuccess = success
             if (success) {
                 viewModel.addLog("字典自动下载成功！")
             } else {
                 viewModel.addLog("字典下载失败，请在设置中手动重试。")
             }
+            // 下载完成后显示对话框
+            showDownloadDialog = true
         }
+    }
+
+    if (showDownloadDialog) {
+        AlertDialog(
+            onDismissRequest = { showDownloadDialog = false },
+            title = {
+                Text(text = if (downloadSuccess) "下载完成" else "下载失败")
+            },
+            text = {
+                Text(
+                    text = if (downloadSuccess) 
+                        "字典文件 (rockyou.txt) 已成功下载并保存到本地。" 
+                    else 
+                        "字典文件下载失败，请检查网络连接后重试。"
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showDownloadDialog = false }
+                ) {
+                    Text("确定")
+                }
+            }
+        )
     }
 
     StatusBar.SetStatusBarColor(darkIcons = true)
