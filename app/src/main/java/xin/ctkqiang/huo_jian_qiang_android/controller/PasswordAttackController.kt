@@ -238,8 +238,6 @@ class PasswordAttackController private constructor() {
             limit = 0
         )
         
-       
-        
         Log.d(TAG, "密码发送完成，共发送: $processedCount 条")
     }
     
