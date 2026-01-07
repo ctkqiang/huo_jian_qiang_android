@@ -500,4 +500,233 @@ object Downloader {
             ""
         }
     }
+
+    /**
+     * 验证文件编码是否为UTF-8
+     *
+     * @param context 应用上下文
+     * @param filename 要验证的文件名，默认为 "rockyou.txt"
+     * @return 如果文件编码可能是UTF-8则返回true，否则返回false
+     */
+    fun isFileEncodingValid(context: Context, filename: String = DEFAULT_FILENAME): Boolean {
+        return try {
+            val file = File(getFileDir(context), filename)
+            if (!file.exists() || !file.canRead()) {
+                Log.w(TAG, "文件不存在或不可读: $filename")
+                return false
+            }
+
+            // 读取文件前几个字节来检查UTF-8 BOM或可打印字符
+            file.inputStream().use { input ->
+                val buffer = ByteArray(1024)
+                val bytesRead = input.read(buffer)
+                if (bytesRead <= 0) {
+                    return true // 空文件视为有效
+                }
+
+                // 简单UTF-8检查：检查是否有BOM或可打印ASCII/UTF-8字符
+                val sample = String(buffer, 0, bytesRead, Charsets.UTF_8)
+                val isValid = sample.toCharArray().all { char ->
+                    char.code in 0..0x10FFFF && !char.isSurrogate()
+                }
+                
+                if (!isValid) {
+                    Log.w(TAG, "文件可能不是有效的UTF-8编码: $filename")
+                }
+                
+                isValid
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "验证文件编码失败: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * 高效逐行处理文件内容
+     *
+     * 此方法使用缓冲读取器逐行处理大文件，避免一次性加载整个文件到内存
+     *
+     * @param context 应用上下文
+     * @param filename 要处理的文件名，默认为 "rockyou.txt"
+     * @param onLine 每读取一行时调用的回调函数，接收行号（从1开始）和行内容
+     * @param charset 字符编码，默认为 UTF-8
+     * @param skipEmptyLines 是否跳过空行，默认为true
+     * @param limit 最大处理行数限制，默认为0表示无限制
+     * @return 成功处理的行数，如果处理失败则返回-1
+     */
+    fun processFileByLine(
+        context: Context,
+        filename: String = DEFAULT_FILENAME,
+        onLine: (lineNumber: Int, line: String) -> Unit,
+        charset: Charset = Charsets.UTF_8,
+        skipEmptyLines: Boolean = true,
+        limit: Int = 0
+    ): Int {
+        return try {
+            val file = File(getFileDir(context), filename)
+            if (!file.exists() || !file.canRead()) {
+                Log.w(TAG, "文件不存在或不可读: $filename")
+                return -1
+            }
+
+            var lineCount = 0
+            var processedCount = 0
+            
+            file.bufferedReader(charset).use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    lineCount++
+                    
+                    if (limit > 0 && processedCount >= limit) {
+                        break
+                    }
+                    
+                    val trimmedLine = line!!.trim()
+                    if (skipEmptyLines && trimmedLine.isEmpty()) {
+                        continue
+                    }
+                    
+                    onLine(lineCount, trimmedLine)
+                    processedCount++
+                }
+            }
+            
+            Log.d(TAG, "文件处理完成: $filename, 总行数: $lineCount, 处理行数: $processedCount")
+            processedCount
+        } catch (e: IOException) {
+            Log.e(TAG, "逐行处理文件失败 (IO异常): ${e.message}")
+            -1
+        } catch (e: SecurityException) {
+            Log.e(TAG, "逐行处理文件失败 (权限异常): ${e.message}")
+            -1
+        } catch (e: Exception) {
+            Log.e(TAG, "逐行处理文件失败 (未知异常): ${e.message}")
+            -1
+        }
+    }
+
+    /**
+     * 处理密码文件（rockyou.txt）并生成密码列表
+     *
+     * 此方法专门用于处理密码字典文件，自动验证文件并处理特殊字符
+     *
+     * @param context 应用上下文
+     * @param filename 密码文件名，默认为 "rockyou.txt"
+     * @param onPassword 每读取一个密码时调用的回调函数，接收行号和密码内容
+     * @param limit 最大处理密码数量限制，默认为0表示无限制
+     * @return 成功处理的密码数量，如果处理失败则返回-1
+     */
+    fun processPasswordFile(
+        context: Context,
+        filename: String = DEFAULT_FILENAME,
+        onPassword: (lineNumber: Int, password: String) -> Unit,
+        limit: Int = 0
+    ): Int {
+        if (!isFileExists(context, filename)) {
+            Log.w(TAG, "密码文件不存在: $filename")
+            return -1
+        }
+        
+        if (!isFileReadable(context, filename)) {
+            Log.w(TAG, "密码文件不可读: $filename")
+            return -1
+        }
+        
+        if (!isFileEncodingValid(context, filename)) {
+            Log.w(TAG, "密码文件编码可能无效: $filename")
+            // 继续处理，但记录警告
+        }
+        
+        return processFileByLine(
+            context = context,
+            filename = filename,
+            onLine = { lineNumber, line ->
+                // 对于密码文件，我们进行额外的验证和清理
+                val password = line.trim()
+                if (password.isNotEmpty()) {
+                    onPassword(lineNumber, password)
+                }
+            },
+            charset = Charsets.UTF_8,
+            skipEmptyLines = true,
+            limit = limit
+        )
+    }
+
+    /**
+     * 获取密码文件中的密码数量
+     *
+     * @param context 应用上下文
+     * @param filename 密码文件名，默认为 "rockyou.txt"
+     * @return 密码数量，如果无法读取则返回-1
+     */
+    fun getPasswordCount(context: Context, filename: String = DEFAULT_FILENAME): Int {
+        return try {
+            val file = File(getFileDir(context), filename)
+            if (!file.exists() || !file.canRead()) {
+                return -1
+            }
+            
+            var count = 0
+            file.bufferedReader().use { reader ->
+                while (reader.readLine() != null) {
+                    count++
+                }
+            }
+            count
+        } catch (e: Exception) {
+            Log.e(TAG, "获取密码数量失败: ${e.message}")
+            -1
+        }
+    }
+
+    /**
+     * 从密码文件中获取指定范围的密码
+     *
+     * @param context 应用上下文
+     * @param startLine 起始行号（从1开始）
+     * @param count 要获取的密码数量
+     * @param filename 密码文件名，默认为 "rockyou.txt"
+     * @return 密码列表，如果获取失败则返回空列表
+     */
+    fun getPasswordsInRange(
+        context: Context,
+        startLine: Int,
+        count: Int,
+        filename: String = DEFAULT_FILENAME
+    ): List<String> {
+        return try {
+            val file = File(getFileDir(context), filename)
+            if (!file.exists() || !file.canRead()) {
+                return emptyList()
+            }
+            
+            val passwords = mutableListOf<String>()
+            var currentLine = 0
+            
+            file.bufferedReader().use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    currentLine++
+                    
+                    if (currentLine >= startLine && currentLine < startLine + count) {
+                        val password = line!!.trim()
+                        if (password.isNotEmpty()) {
+                            passwords.add(password)
+                        }
+                    }
+                    
+                    if (currentLine >= startLine + count) {
+                        break
+                    }
+                }
+            }
+            
+            passwords
+        } catch (e: Exception) {
+            Log.e(TAG, "获取指定范围密码失败: ${e.message}")
+            emptyList()
+        }
+    }
 }
